@@ -7,7 +7,7 @@ holder = re.compile("\$\{([^$]+)\}")
 __all__ = ["RCodeGen"]
 
 
-class RepetitiveCode:
+class _RepetitiveCode:
     def __init__(self, owner, dict) -> None:
         self.owner = owner
         self.dict = dict
@@ -17,6 +17,23 @@ class RepetitiveCode:
 
     def __exit__(self, type, value, traceback):
         self.owner.dict_list = self.owner.dict_list[1:]
+
+
+class _SubHierarc:
+    def __init__(self, owner, text, type="none"):
+        self.owner = owner
+
+        self.owner.add(text)
+
+    def __enter__(self):
+        if type == "block":
+            self.owner.add("{")
+        self.owner.intend_level += 1
+
+    def __exit__(self, type, value, traceback):
+        self.owner.intend_level -= 1
+        if type == "block":
+            self.owner.add("}")
 
 
 class RCodeGen:
@@ -48,16 +65,9 @@ class RCodeGen:
     def open(self):
         self.out = open(self.filename, 'w')
 
-    def __enter__(self):
-        self.open()
-        return self
-
     def close(self):
         self.out.close()
         self.out = None
-
-    def __exit__(self, type, value, traceback):
-        self.close()
 
     def add(self, text):
         self._write(self._format(text))
@@ -65,20 +75,18 @@ class RCodeGen:
     def blank_line(self):
         self._write("")
 
+    def add_dict(self, **dict):
+        self.dict_list = [dict] + self.dict_list
+
     def repetitive_code(self, **dict):
-        return RepetitiveCode(self, dict)
+        return _RepetitiveCode(self, dict)
 
+    def sub_hierarc(self, text, type):
+        return _SubHierarc(self, text)
 
-class RClangGen(RCodeGen):
-    def __init__(self, filename, indent_chars="  "):
-        RCodeGen.__init__(self, filename, indent_chars)
+    def __enter__(self):
+        self.open()
+        return self
 
-
-class Declaration:
-    def __init__(self, owner):
-        pass
-
-
-class Function:
-    def __init__(self, owner):
-        pass
+    def __exit__(self, type, value, traceback):
+        self.close()

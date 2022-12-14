@@ -7,7 +7,7 @@ holder = re.compile("\$\{([^$]+)\}")
 __all__ = ["RCodeGen"]
 
 
-class _RepetitiveCode:
+class _TempDict:
     def __init__(self, owner, dict) -> None:
         self.owner = owner
         self.dict = dict
@@ -20,27 +20,27 @@ class _RepetitiveCode:
 
 
 class _SubHierarc:
-    def __init__(self, owner, text, type="none"):
+    def __init__(self, owner, text, style="default"):
         self.owner = owner
-
+        self.style = style
         self.owner.add(text)
 
     def __enter__(self):
-        if type == "block":
+        if self.style == "block":
             self.owner.add("{")
         self.owner.intend_level += 1
 
     def __exit__(self, type, value, traceback):
         self.owner.intend_level -= 1
-        if type == "block":
+        if self.style == "block":
             self.owner.add("}")
 
 
 class RCodeGen:
     def __init__(self, filename, indent_chars="\t"):
         self.out = None
-        self.filename = filename
         self.dict_list = []
+        self.filename = filename
         self.indent_chars = indent_chars
         self.intend_level = 0
 
@@ -75,14 +75,14 @@ class RCodeGen:
     def blank_line(self):
         self._write("")
 
-    def add_dict(self, **dict):
+    def dict(self, **dict):
         self.dict_list = [dict] + self.dict_list
 
-    def repetitive_code(self, **dict):
-        return _RepetitiveCode(self, dict)
+    def temp_dict(self, **dict):
+        return _TempDict(self, dict)
 
-    def sub_hierarc(self, text, type):
-        return _SubHierarc(self, text)
+    def sub_hierarc(self, text, style):
+        return _SubHierarc(self, text, style)
 
     def __enter__(self):
         self.open()

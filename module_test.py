@@ -37,7 +37,7 @@ void get_functions()
 {
   ${func} = (${func_type})${get_func_proc}("${func}");
   if (!${func}) {
-    error_to_console("Failed to get ${func} function.");
+    return 0;
   }
   // ...
 }
@@ -66,6 +66,4 @@ with RCodeGen("test\\test.c", "  ") as test_c_file:
                     func=gl_func, func_type="PFN"+gl_func.upper()+"PROC", get_func_proc="wglGetProcAddress"):
                 test_c_file.add(
                     "${func} = (${func_type})${get_func_proc}(\"${func}\");")
-                with test_c_file.sub_hierarc("if (!${func})", "block"):
-                    test_c_file.add(
-                        "error_to_console(\"Failed to get ${func} function.\");")
+                test_c_file.add("if (!${func}) return 0;")

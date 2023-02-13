@@ -43,10 +43,38 @@ void get_functions()
 }
 '''
 gl_funcs = [
-    "glCreateProgram",
-    "glLinkProgram",
-    "glUseProgram",
-    "glDeleteProgram"
+ "glCreateProgram",
+ "glLinkProgram",
+ "glUseProgram",
+ "glDeleteProgram",
+ "glGetProgramiv",
+ "glGetProgramInfoLog",
+ "glCreateShader",
+ "glShaderSource",
+ "glCompileShader",
+ "glAttachShader",
+ "glDetachShader",
+ "glDeleteShader",
+ "glGetShaderiv",
+ "glGetShaderInfoLog",
+ "glGenVertexArrays",
+ "glBindVertexArray",
+ "glDeleteVertexArrays",
+ "glEnableVertexAttribArray",
+ "glVertexAttribPointer",
+ "glDisableVertexAttribArray",
+ "glGenBuffers",
+ "glBindBuffer",
+ "glBufferData",
+ "glDeleteBuffers",
+ "glGetAttribLocation",
+ "glBindAttribLocation",
+ "glGetUniformLocation",
+ "glUniformMatrix4fv",
+ "glUniform1i",
+ "glUniform3fv",
+ "glUniform4fv",
+ "glGenerateMipmap",
 ]
 with RCodeGen("test\\test.c", "  ") as test_c_file:
     test_c_file.dict(platform="win")
